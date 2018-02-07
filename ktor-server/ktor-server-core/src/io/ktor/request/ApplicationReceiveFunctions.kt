@@ -68,10 +68,10 @@ suspend fun <T : Any> ApplicationCall.receive(type: KClass<T>): T {
  * @return instance of [T] received from this call, or `null` if content cannot be transformed to the requested type..
  */
 suspend fun <T : Any> ApplicationCall.receiveOrNull(type: KClass<T>): T? {
-    val incomingContent = request.receiveContent()
+    val incomingContent = request.receiveChannel()
     val receiveRequest = ApplicationReceiveRequest(type, incomingContent)
     val transformed = request.pipeline.execute(this, receiveRequest).value
-    if (transformed is IncomingContent)
+    if (transformed is ByteReadChannel && type != ByteReadChannel::class)
         return null
 
     @Suppress("UNCHECKED_CAST")
